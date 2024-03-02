@@ -1,50 +1,79 @@
-//your JS code here. If required.
-// Get form elements
-const loginForm = document.getElementById('loginForm');
-const usernameInput = document.getElementById('username');
-const passwordInput = document.getElementById('password');
-const rememberMeCheckbox = document.getElementById('checkbox');
-const submitButton = document.getElementById('submit');
-const existingButton = document.getElementById('existing');
+const products = [
+  { id: 1, name: "Product 1", price: 10 },
+  { id: 2, name: "Product 2", price: 20 },
+  { id: 3, name: "Product 3", price: 30 },
+  { id: 4, name: "Product 4", price: 40 },
+  { id: 5, name: "Product 5", price: 50 },
+];
 
-// Check if there are saved details in local storage
-const savedUsername = localStorage.getItem('username');
-const savedPassword = localStorage.getItem('password');
+// DOM elements
+const productList = document.getElementById("product-list");
+const cartList = document.getElementById("cart-list");
+const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// If there are saved details, show the "Login as existing user" button
-if (savedUsername && savedPassword) {
-    existingButton.style.display = 'inline';
+// Get cart data from session storage or initialize it
+let cart = JSON.parse(sessionStorage.getItem("cart")) || [];
+
+// Render product list
+function renderProducts() {
+  products.forEach((product) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
+    productList.appendChild(li);
+  });
 }
 
-// Add event listener for form submission
-loginForm.addEventListener('submit', function(event) {
-    event.preventDefault(); // Prevent default form submission behavior
+// Render cart list
+function renderCart() {
+  cartList.innerHTML = "";
+  cart.forEach((cartItem) => {
+    const li = document.createElement("li");
+    li.innerHTML = `${cartItem.name} - $${cartItem.price} <button class="remove-from-cart-btn" data-id="${cartItem.id}">Remove from Cart</button>`;
+    cartList.appendChild(li);
+  });
+}
 
-    // Get username and password from form inputs
-    const username = usernameInput.value;
-    const password = passwordInput.value;
+// Add item to cart
+function addToCart(productId) {
+  const productToAdd = products.find((product) => product.id === productId);
+  if (productToAdd) {
+    cart.push(productToAdd);
+    sessionStorage.setItem("cart", JSON.stringify(cart));
+    renderCart();
+  }
+}
 
-    // Check if "Remember me" checkbox is checked
-    if (rememberMeCheckbox.checked) {
-        // Save username and password in local storage
-        localStorage.setItem('username', username);
-        localStorage.setItem('password', password);
-    } else {
-        // Remove saved username and password from local storage
-        localStorage.removeItem('username');
-        localStorage.removeItem('password');
-    }
+// Remove item from cart
+function removeFromCart(productId) {
+  cart = cart.filter((cartItem) => cartItem.id !== productId);
+  sessionStorage.setItem("cart", JSON.stringify(cart));
+  renderCart();
+}
 
-    // Display alert with logged in message
-    alert('Logged in as ' + username);
+// Clear cart
+function clearCart() {
+  cart = [];
+  sessionStorage.removeItem("cart");
+  renderCart();
+}
+
+// Event listeners
+productList.addEventListener("click", (event) => {
+  if (event.target.classList.contains("add-to-cart-btn")) {
+    const productId = parseInt(event.target.getAttribute("data-id"));
+    addToCart(productId);
+  }
 });
 
-// Add event listener for "Login as existing user" button
-existingButton.addEventListener('click', function() {
-    // Get saved username from local storage
-    const savedUsername = localStorage.getItem('username');
-    if (savedUsername) {
-        // Display alert with logged in message
-        alert('Logged in as ' + savedUsername);
-    }
+cartList.addEventListener("click", (event) => {
+  if (event.target.classList.contains("remove-from-cart-btn")) {
+    const productId = parseInt(event.target.getAttribute("data-id"));
+    removeFromCart(productId);
+  }
 });
+
+clearCartBtn.addEventListener("click", clearCart);
+
+// Initial render
+renderProducts();
+renderCart();
