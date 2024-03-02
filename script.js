@@ -1,38 +1,50 @@
-// This is the boilerplate code given for you
-// You can modify this code
-// Product data
-const products = [
-  { id: 1, name: "Product 1", price: 10 },
-  { id: 2, name: "Product 2", price: 20 },
-  { id: 3, name: "Product 3", price: 30 },
-  { id: 4, name: "Product 4", price: 40 },
-  { id: 5, name: "Product 5", price: 50 },
-];
+//your JS code here. If required.
+// Get form elements
+const loginForm = document.getElementById('loginForm');
+const usernameInput = document.getElementById('username');
+const passwordInput = document.getElementById('password');
+const rememberMeCheckbox = document.getElementById('checkbox');
+const submitButton = document.getElementById('submit');
+const existingButton = document.getElementById('existing');
 
-// DOM elements
-const productList = document.getElementById("product-list");
+// Check if there are saved details in local storage
+const savedUsername = localStorage.getItem('username');
+const savedPassword = localStorage.getItem('password');
 
-// Render product list
-function renderProducts() {
-  products.forEach((product) => {
-    const li = document.createElement("li");
-    li.innerHTML = `${product.name} - $${product.price} <button class="add-to-cart-btn" data-id="${product.id}">Add to Cart</button>`;
-    productList.appendChild(li);
-  });
+// If there are saved details, show the "Login as existing user" button
+if (savedUsername && savedPassword) {
+    existingButton.style.display = 'inline';
 }
 
-// Render cart list
-function renderCart() {}
+// Add event listener for form submission
+loginForm.addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission behavior
 
-// Add item to cart
-function addToCart(productId) {}
+    // Get username and password from form inputs
+    const username = usernameInput.value;
+    const password = passwordInput.value;
 
-// Remove item from cart
-function removeFromCart(productId) {}
+    // Check if "Remember me" checkbox is checked
+    if (rememberMeCheckbox.checked) {
+        // Save username and password in local storage
+        localStorage.setItem('username', username);
+        localStorage.setItem('password', password);
+    } else {
+        // Remove saved username and password from local storage
+        localStorage.removeItem('username');
+        localStorage.removeItem('password');
+    }
 
-// Clear cart
-function clearCart() {}
+    // Display alert with logged in message
+    alert('Logged in as ' + username);
+});
 
-// Initial render
-renderProducts();
-renderCart();
+// Add event listener for "Login as existing user" button
+existingButton.addEventListener('click', function() {
+    // Get saved username from local storage
+    const savedUsername = localStorage.getItem('username');
+    if (savedUsername) {
+        // Display alert with logged in message
+        alert('Logged in as ' + savedUsername);
+    }
+});
